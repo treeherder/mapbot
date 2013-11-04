@@ -9,17 +9,7 @@
 #include <string.h>
 #include <Wire.h>
 #include <math.h>
-
-#define compass 0x1E
-
-int regb=0x01;
-int regbdata=0x40;
- 
-int outputData[6];
- 
-
-
-
+#define compass 0x1E;
 const int pingPin (6);          // ping sensor
 const int laser(7);
 const int aDirectional (12);        // setting up motors
@@ -227,37 +217,6 @@ long microsecondsToCentimeters(long microseconds)
 	return microseconds / 29 / 2;
 }
 
-
-
-
-
-/*
-int clearance()   // overhead clearance
-{
-          //turn ir emitters off
-            digitalWrite(oneIRPos, HIGH);
-            digitalWrite(oneIRNeg, LOW);
-            digitalWrite(twoIRPos, HIGH);
-            digitalWrite(twoIRNeg, LOW);
-            // measure ambient infra red light
-            ambientIR = analogRead(irBlister);
-            delay(500);
-          // pulse the IR LEDS, measure new value (badIR)
-            digitalWrite(oneIRPos, LOW);
-            digitalWrite(oneIRNeg, HIGH);
-            digitalWrite(twoIRPos, LOW);
-            digitalWrite(twoIRNeg, HIGH);  
-            delay(5);
-            badIR = analogRead(irBlister);
-            delay(50);
-          // reduce ambient infra red light 
-             goodIR = badIR - ambientIR;
-             Serial.print(" sensing reflected infrared at .......    ");
-             Serial.println(goodIR);
-             return goodIR;
-}
-
-*/
 
 void test_load()
 {
