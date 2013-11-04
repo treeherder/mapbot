@@ -3,10 +3,50 @@ import cv2
 import numpy as np
 from subprocess import call
 import time
+import serial
 
-def cap(im):
-  # set up media and capture an image:
-  call(['python', 'stilpy.py', '--image', '{0}'.format(im)])
+class ctrl:
+	PING = "5"
+	COMPASS = "6"
+	LASER_ON = "7"
+	LASER_OFF = "8"
+	
+class Chassis():
+ 
+  def __init__(self):
+    self.com = serial.Serial('/dev/ttyAMA*', '9600', timeout = None)
+    time.sleep(2)
+ 
+  def ping(self):
+    self.com.write(ctrl.PING) # command for ping data
+    self.com.flush()
+    time.sleep(0.2)
+    return  self.com.readline()
+ 
+ 
+  def compass(self):
+    self.com.write(ctrl.COMPASS)  # command for compass data
+    time.sleep(0.2)
+    return  self.com.readline()
+
+    self.com.flush()
+    
+  def las_on(self):
+    self.com.write(ctrl.LASER_ON)  # toggle laser
+    self.com.flush()
+    
+  def las_off(self):
+    self.com.write(ctrl.LASER_OFF)  # toggle laser
+    self.com.flush()
+    
+class imager():
+  def cap(im):
+    # set up media and capture an image:
+    call(['python', 'stilpy.py', '--image', '{0}'.format(im)])
+  def las_cap(im)
+    chassis.las_on()
+    cap(im)
+    chassis.las_off()
 
 def basic():
 
@@ -27,6 +67,11 @@ def basic():
 
   #cv2.imshow(' smoooth', smooth_img)
   #cv2.imshow('raw video', raw)
+chassis = Chassis()
+
 x = time.asctime().replace(' ' , '')
 x = x.replace(':','')
-cap(x)
+x = x.append("-r-{0}".format(chassis.compass()))
+trial = imager()
+trial.cap(x)
+
