@@ -1,6 +1,6 @@
 //============================================================================
-// Name        : mapbot
-// Author      : treeherder
+// Name        : garbagebot
+// Author      : wintermute
 // Version     : alpha
 // Copyright is lame.
 // Description : a trivial exercise in cartography/pathfinding
@@ -9,7 +9,10 @@
 #include <string.h>
 #include <Wire.h>
 #include <math.h>
-#define compass 0x1E;
+#define compass 0x1E
+
+
+
 const int pingPin (6);          // ping sensor
 const int laser(7);
 const int aDirectional (12);        // setting up motors
@@ -40,10 +43,10 @@ void setup()
         pinMode(bCurrent, INPUT);
         pinMode(laser, OUTPUT);
         Wire.begin();
-  	Wire.beginTransmission(compass); 
-  	Wire.write(byte(0x02));
- 	Wire.write(byte(0x00));
-  	Wire.endTransmission();
+        Wire.beginTransmission(compass); 
+        Wire.write(byte(0x02));
+        Wire.write(byte(0x00));
+        Wire.endTransmission();
 
 
 }
@@ -71,7 +74,7 @@ void loop(){
        Serial.println(ping());
        break;
      case '6':
-       Serial.println(read_compass());
+       Serial.println(read_compass(), DEC);
        break;
      case '7':
        las_on();
@@ -159,8 +162,8 @@ int left(int rate, int time)
 }
 
 
-// sensor and methods  ... gets a little hairy!
-float compass() {
+// sensor methods  ... gets a little hairy!
+float read_compass() {
   int x, y, z;
 
   // Initiate communications with compass
@@ -176,18 +179,23 @@ float compass() {
 
   }
    // Calculate heading when the magnetometer is level, then correct for signs of axis.
-  float heading = atan2(x, y);
-   
-  // Correct for when signs are reversed.
+  float heading = atan2(x, y); // Correct for when signs are reversed.
   if(heading < 0)
     heading += 2*PI;
    
   // Convert radians to degrees for readability.
+  double deg = heading * 180/M_PI; 
+
+  // Output the data via the serial port.
+   
+  // Correct for when signs are reversed.
+  /*if(heading < 0)
+    heading += 2*PI;
+   
+  // Convert radians to degrees for readability.
   float h_deg = heading * 180/M_PI; 
-  return (h_deg);
+  */return (heading);
 }
-
-
 
 int ping()
 {
@@ -217,7 +225,6 @@ long microsecondsToCentimeters(long microseconds)
 	return microseconds / 29 / 2;
 }
 
-
 void test_load()
 {
         //  a method to control motor rate/load and sense stalls
@@ -229,14 +236,6 @@ void test_load()
           Serial.println(bCur);
 }
 
-int heading()
-{
-  int i,avg;
-       {size_t i; for(i = 0; i < 10; ++i) read_compass(); }
-       avg = 0; 
-       for(i = 0; i < 10; ++i){ avg = (avg * i + read_compass()) / (i + 1);}
-       return avg;
-}
 
 void las_on(){digitalWrite(laser, HIGH);}
 void las_off(){digitalWrite(laser, LOW);}
