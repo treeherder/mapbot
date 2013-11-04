@@ -14,7 +14,7 @@ class ctrl:
 class Chassis():
  
   def __init__(self):
-    self.com = serial.Serial('/dev/ttyAMA*', '9600', timeout = None)
+    self.com = serial.Serial('/dev/ttyAMA0', '9600', timeout = None)
     time.sleep(2)
  
   def ping(self):
@@ -40,12 +40,12 @@ class Chassis():
     self.com.flush()
     
 class imager():
-  def cap(im):
+  def cap(self, im):
     # set up media and capture an image:
     call(['python', 'stilpy.py', '--image', '{0}'.format(im)])
-  def las_cap(im)
+  def las_cap(self, im):
     chassis.las_on()
-    cap(im)
+    self.cap(im)
     chassis.las_off()
 
 def basic():
@@ -71,7 +71,7 @@ chassis = Chassis()
 
 x = time.asctime().replace(' ' , '')
 x = x.replace(':','')
-x = x.append("-r-{0}".format(chassis.compass()))
+x+="-r-{0}".format(chassis.compass())
 trial = imager()
-trial.cap(x)
+trial.las_cap(x)
 
