@@ -71,7 +71,8 @@ chassis = Chassis()
 
 x = time.asctime().replace(' ' , '')
 x = x.replace(':','')
-x+="--{0}".format(chassis.compass())
+x+="-{0}".format(chassis.compass())
+x = x.replace('.','_')
 x=x[:30]
 trial = imager()
 trial.las_cap(x)
