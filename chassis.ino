@@ -1,6 +1,6 @@
 //============================================================================
-// Name        : garbagebot
-// Author      : wintermute
+// Name        : mapbot
+// Author      : treeherder
 // Version     : alpha
 // Copyright is lame.
 // Description : a trivial exercise in cartography/pathfinding
