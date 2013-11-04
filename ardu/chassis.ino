@@ -229,62 +229,6 @@ int read_compass() {
    angle= atan2((double)y - y_offset,(double)x - x_offset)* (180 / 3.14159265) +180; // angle in degrees
 #endif
  
-  /*
- 
-   Refer the following application note for heading calculation.
-   http://www.ssec.honeywell.com/magnetic/datasheets/lowcost.pdf
-   ----------------------------------------------------------------------------------------
-   atan2(y, x) is the angle in radians between the positive x-axis of a plane and the point
-   given by the coordinates (x, y) on it.
-   ----------------------------------------------------------------------------------------
- 
-   This sketch does not utilize the magnetic component Z as tilt compensation can not be done without an Accelerometer
- 
-   ----------------->y
-   |
-   |
-   |
-   |
-   |
-   |
-   \/
-   x
- 
- 
- 
-         N
-     NW  |  NE
-   |
-   W----------E
-   |
-     SW  |  SE
-         S
- 
-   */
- 
- 
-// only print the detail if NOT doing either sending either calibration data set to serial
- 
-  //Print the approximate direction
-  Serial.print("You are heading ");
-  if((angle < 22.5) || (angle > 337.5 ))
-    Serial.print("South");
-  if((angle > 22.5) && (angle < 67.5 ))
-    Serial.print("South-West");
-  if((angle > 67.5) && (angle < 112.5 ))
-    Serial.print("West");
-  if((angle > 112.5) && (angle < 157.5 ))
-    Serial.print("North-West");
-  if((angle > 157.5) && (angle < 202.5 ))
-    Serial.print("North");
-  if((angle > 202.5) && (angle < 247.5 ))
-    Serial.print("NorthEast");
-  if((angle > 247.5) && (angle < 292.5 ))
-    Serial.print("East");
-  if((angle > 292.5) && (angle < 337.5 ))
-    Serial.print("SouthEast");
- 
-  Serial.print(": Angle between X-axis and the South direction ");
   if((0 < angle) && (angle < 180) )
   {
     angle=angle;
@@ -293,16 +237,6 @@ int read_compass() {
   {
     angle=360-angle;
   }
-  Serial.print(angle);
-  Serial.println(" Deg");
-  Serial.print("{ ");
-  Serial.print(", x = ");
-  Serial.print(x);
-  Serial.print(",y =  ");
-  Serial.print(y);
-
-  Serial.println(" }, ");
-  delay(100);
   return(angle);
 }
 
