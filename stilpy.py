@@ -7,4 +7,4 @@ p.add_argument('--image', dest='image', metavar='i', type=str,  help='give a nam
 args = p.parse_args()
 
 
-call(['raspistill', '-o', '{0}.jpg'.format(args.image)])
+call(['raspistill', '-o', 'map_pics/{0}.jpg'.format(args.image)])
