@@ -47,12 +47,11 @@ class imager():
     print(value)
     chassis.las_off()
 
+
 def basic(z):
-  
   img = cv2.imread('map_pics/{0}'.format(z))
   hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-  cv2.imwrite("hsv{0}.jpg".format(z), hsv)
-  print hsv.shape
+  cv2.imwrite("map_pics/hsv{0}".format(z), hsv)
  
 chassis = Chassis()
 
@@ -61,6 +60,7 @@ x = x.replace(':','')
 x+="-{0}".format(chassis.compass())
 x = x.replace('.','_')
 x=x[:25]
+x+='.jpg'
 trial = imager()
 trial.cap(x)
 basic(x)
