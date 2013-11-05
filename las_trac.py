@@ -48,12 +48,10 @@ class imager():
     chassis.las_off()
 
 def basic(z):
-  z =  "map_pics/"+z    #take the bgr image and convert to hsv, then save it
   
-  img = cv2.imread('{0}'.format(z))
-  img = cv2.blur(img, av2.GaussianBlur())
-  hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-  cv2.saveImage("hsv{0}".format(z), hsv)
+  img = cv2.imread('map_pics/{0}'.format(z))
+  hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+  cv2.imwrite("hsv{0}.jpg".format(z), hsv)
   print hsv.shape
  
 chassis = Chassis()
@@ -65,4 +63,4 @@ x = x.replace('.','_')
 x=x[:25]
 trial = imager()
 trial.cap(x)
-
+basic(x)
