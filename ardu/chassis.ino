@@ -1,6 +1,6 @@
 //============================================================================
-// Name        : mapbot
-// Author      : treeherder
+// Name        : garbagebot
+// Author      : wintermute
 // Version     : alpha
 // Copyright is lame.
 // Description : a trivial exercise in cartography/pathfinding
@@ -9,32 +9,7 @@
 #include <string.h>
 #include <Wire.h>
 #include <math.h>
-#define I2C_TX write
-#define I2C_RX read 
-#define SCALE
-#define HMC5883_WriteAddress 0x1E //  i.e 0x3C >> 1
-#define HMC5883_ModeRegisterAddress 0x02
- 
-#define HMC5883_ContinuousModeCommand (uint8_t)0x00     // cast to uint8_t added to get code to compile under Arduino v1.0
- 
-#define HMC5883_DataOutputXMSBAddress  0x03
- 
-int regb=0x01;
-int regbdata=0x40;
- 
-int outputData[6];
- 
-// calibrate compass
-const int x_offset = 0;
-const int y_offset = 0;
-const int z_offset = 0;
- 
-#ifdef SCALE
-const int x_scale = 1;
-const int y_scale = 1;
-const int z_scale = 1;
-#endif
- 
+#define compass 0x1E
 
 
 
@@ -68,6 +43,10 @@ void setup()
         pinMode(bCurrent, INPUT);
         pinMode(laser, OUTPUT);
         Wire.begin();
+        Wire.beginTransmission(compass); 
+        Wire.write(byte(0x02));
+        Wire.write(byte(0x00));
+        Wire.endTransmission();
 
 
 }
@@ -95,7 +74,7 @@ void loop(){
        Serial.println(ping());
        break;
      case '6':
-       Serial.println(read_compass());
+       Serial.println(read_compass(), DEC);
        break;
      case '7':
        las_on();
@@ -183,61 +162,39 @@ int left(int rate, int time)
 }
 
 
-// sensor and methods  ... gets a little hairy!
+// sensor methods  ... gets a little hairy!
+float read_compass() {
+  int x, y, z;
 
-int read_compass() {
-        
-  int i,x,y,z;
-  double angle;
- 
-  Wire.beginTransmission(HMC5883_WriteAddress);
-  Wire.I2C_TX(regb);
-  Wire.I2C_TX(regbdata);
+  // Initiate communications with compass
+  Wire.beginTransmission(compass);
+  Wire.write(byte(0x03));       // Send request to X MSB register
   Wire.endTransmission();
- 
-  delay(1000);
-  Wire.beginTransmission(HMC5883_WriteAddress); //Initiate a transmission with HMC5883 (Write address).
-  Wire.I2C_TX(HMC5883_ModeRegisterAddress);       //Place the Mode Register Address in send-buffer.
-  Wire.I2C_TX(HMC5883_ContinuousModeCommand);     //Place the command for Continuous operation Mode in send-buffer.
-  Wire.endTransmission();                       //Send the send-buffer to HMC5883 and end the I2C transmission.
-  delay(100);
- 
- 
-  Wire.beginTransmission(HMC5883_WriteAddress);  //Initiate a transmission with HMC5883 (Write address).
-  Wire.requestFrom(HMC5883_WriteAddress,6);      //Request 6 bytes of data from the address specified.
- 
-  delay(500);
- 
- 
-  //Read the value of magnetic components X,Y and Z
- 
-  if(6 <= Wire.available()) // If the number of bytes available for reading be <=6.
-  {
-    for(i=0;i<6;i++)
-    {
-      outputData[i]=Wire.I2C_RX();  //Store the data in outputData buffer
-    }
+
+  Wire.requestFrom(compass, 6);    // Request 6 bytes; 2 bytes per axis
+  if(Wire.available() <=6) {    // If 6 bytes available
+    x = Wire.read() << 8 | Wire.read();
+    z = Wire.read() << 8 | Wire.read();
+    y = Wire.read() << 8 | Wire.read();
+
   }
- 
-  x=outputData[0] << 8 | outputData[1]; //Combine MSB and LSB of X Data output register
-  z=outputData[2] << 8 | outputData[3]; //Combine MSB and LSB of Z Data output register
-  y=outputData[4] << 8 | outputData[5]; //Combine MSB and LSB of Y Data output register
- 
-#ifdef SCALE
-   angle= atan2((double)y * y_scale - y_offset,(double)x * x_scale - x_offset)* (180 / 3.14159265) +180; // angle in degrees
-#else
-   angle= atan2((double)y - y_offset,(double)x - x_offset)* (180 / 3.14159265) +180; // angle in degrees
-#endif
- 
-  if((0 < angle) && (angle < 180) )
-  {
-    angle=angle;
-  }
-  else
-  {
-    angle=360-angle;
-  }
-  return(angle);
+   // Calculate heading when the magnetometer is level, then correct for signs of axis.
+  float heading = atan2(x, y); // Correct for when signs are reversed.
+  if(heading < 0)
+    heading += 2*PI;
+   
+  // Convert radians to degrees for readability.
+  double deg = heading * 180/M_PI; 
+
+  // Output the data via the serial port.
+   
+  // Correct for when signs are reversed.
+  /*if(heading < 0)
+    heading += 2*PI;
+   
+  // Convert radians to degrees for readability.
+  float h_deg = heading * 180/M_PI; 
+  */return (heading);
 }
 
 int ping()
@@ -268,38 +225,6 @@ long microsecondsToCentimeters(long microseconds)
 	return microseconds / 29 / 2;
 }
 
-
-
-
-
-/*
-int clearance()   // overhead clearance
-{
-          //turn ir emitters off
-            digitalWrite(oneIRPos, HIGH);
-            digitalWrite(oneIRNeg, LOW);
-            digitalWrite(twoIRPos, HIGH);
-            digitalWrite(twoIRNeg, LOW);
-            // measure ambient infra red light
-            ambientIR = analogRead(irBlister);
-            delay(500);
-          // pulse the IR LEDS, measure new value (badIR)
-            digitalWrite(oneIRPos, LOW);
-            digitalWrite(oneIRNeg, HIGH);
-            digitalWrite(twoIRPos, LOW);
-            digitalWrite(twoIRNeg, HIGH);  
-            delay(5);
-            badIR = analogRead(irBlister);
-            delay(50);
-          // reduce ambient infra red light 
-             goodIR = badIR - ambientIR;
-             Serial.print(" sensing reflected infrared at .......    ");
-             Serial.println(goodIR);
-             return goodIR;
-}
-
-*/
-
 void test_load()
 {
         //  a method to control motor rate/load and sense stalls
@@ -311,14 +236,6 @@ void test_load()
           Serial.println(bCur);
 }
 
-int heading()
-{
-  int i,avg;
-       {size_t i; for(i = 0; i < 10; ++i) read_compass(); }
-       avg = 0; 
-       for(i = 0; i < 10; ++i){ avg = (avg * i + read_compass()) / (i + 1);}
-       return avg;
-}
 
 void las_on(){digitalWrite(laser, HIGH);}
 void las_off(){digitalWrite(laser, LOW);}
