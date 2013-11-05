@@ -52,9 +52,9 @@ def basic(z):
   img = cv2.imread('map_pics/{0}'.format(z))
   hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
   (hue, sat, val)  = cv2.split(hsv)
-  hf, hue  = cv2.threshold(hue, 5, 6, cv2.THRESH_BINARY)
-  sf, sat  = cv2.threshold(sat, 50, 100, cv2.THRESH_BINARY)
-  vf, val  = cv2.threshold(val, 250, 256, cv2.THRESH_BINARY)
+  hf, hue  = cv2.threshold(hue, 4, 7, cv2.THRESH_BINARY)
+  sf, sat  = cv2.threshold(sat, 50, 60, cv2.THRESH_BINARY)
+  vf, val  = cv2.threshold(val, 220, 255, cv2.THRESH_BINARY)
   mrgd = cv2.merge([hue, sat, val])
   cv2.imwrite("map_pics/h-{0}".format(z), mrgd)
 
