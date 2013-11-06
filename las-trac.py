@@ -52,11 +52,13 @@ def basic(z):
   img = cv2.imread('map_pics/{0}'.format(z))
   hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
   (hue, sat, val)  = cv2.split(hsv)
-  hf, hue  = cv2.threshold(hue, 4, 7, cv2.THRESH_BINARY)
-  sf, sat  = cv2.threshold(sat, 50, 60, cv2.THRESH_BINARY)
-  vf, val  = cv2.threshold(val, 220, 255, cv2.THRESH_BINARY)
+  hf, hue  = cv2.threshold(hue, 0, 20, cv2.THRESH_BINARY)
+  sf, sat  = cv2.threshold(sat, 254, 255, cv2.THRESH_BINARY)
+  vf, val  = cv2.threshold(val, 200, 220, cv2.THRESH_BINARY)
   mrgd = cv2.merge([hue, sat, val])
-  cv2.imwrite("map_pics/h-{0}".format(z), mrgd)
+  bgr = cv2.cvtColor(mrgd, cv2.COLOR_HSV2BGR)
+  gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+  cv2.imwrite("map_pics/h-{0}".format(z), gray)
 
 chassis = Chassis()
 
